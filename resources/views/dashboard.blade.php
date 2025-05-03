@@ -22,7 +22,7 @@
                 <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
                 <h4 class="font-weight-normal mb-3">Company Count <i class="mdi mdi-chart-line mdi-24px float-end"></i>
                 </h4>
-                <h2 class="mb-5">10</h2>
+                <h2 class="mb-5">{{ $company_count }}</h2>
             </div>
             </div>
         </div>
@@ -32,7 +32,7 @@
                 <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
                 <h4 class="font-weight-normal mb-3">Total Added Invoice <i class="mdi mdi-bookmark-outline mdi-24px float-end"></i>
                 </h4>
-                <h2 class="mb-5">150</h2>
+                <h2 class="mb-5">{{ $total_invoice }}</h2>
             </div>
             </div>
         </div>
@@ -40,9 +40,9 @@
             <div class="card bg-gradient-success card-img-holder text-white">
             <div class="card-body">
                 <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
-                <h4 class="font-weight-normal mb-3">Most Active Company <i class="mdi mdi-diamond mdi-24px float-end"></i>
+                <h4 class="font-weight-normal mb-3">Total Invoice Added Today <i class="mdi mdi-diamond mdi-24px float-end"></i>
                 </h4>
-                <h2 class="mb-5">My First Company</h2>
+                <h2 class="mb-5">{{ $total_invoice_today }}</h2>
             </div>
             </div>
         </div>

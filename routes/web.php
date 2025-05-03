@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountTitleController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportsController;
@@ -25,35 +26,70 @@ Route::get('/', function () {
     return view('auth.login');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/create-invoice', [InvoiceController::class, 'create'])->name('invoice.create');
+    Route::prefix('invoices')->controller(InvoiceController::class)->group(function() {
+        Route::get('/', 'index')->name('invoices.index');
+        Route::get('/create', 'create')->name('invoices.create');
+        Route::post('/create', 'store')->name('invoices.store');
+        Route::get('/{invoice}/show', 'show')->name('invoices.show');
+        Route::post('/update', 'update')->name('invoices.update');
+        Route::post('/delete', 'delete')->name('invoices.delete');
+        Route::get('/fetch-account-section', 'fetchAccountSection')->name('invoices.fetch-account-section');
+        Route::get('/fetch-content', 'fetchContent')->name('invoices.fetch-content');
+    });
 
     Route::prefix('company')->controller(CompanyController::class)->group(function() {
         Route::get('/', 'index')->name('company.index');
+        Route::post('/', 'store')->name('company.store');
+        Route::post('/update', 'update')->name('company.update');
+        Route::post('/update-status', 'updateStatus')->name('company.update-status');
+        Route::get('/fetch-content', 'fetchContent')->name('company.fetch-content');
+      
     });
 
     Route::prefix('sales')->controller(SalesCategoryController::class)->group(function() {
         Route::get('/', 'index')->name('sales.index');
+        Route::post('/', 'store')->name('sales.store');
+        Route::post('/update', 'update')->name('sales.update');
+        Route::get('/fetch-content', 'fetchContent')->name('sales.fetch-content');
+        Route::post('/update-status', 'updateStatus')->name('sales.update-status');
+      
     });
 
-    Route::prefix('accounts')->controller(AccountTitleController::class)->group(function() {
+    Route::prefix('accounts')->controller(AccountTitleController::class)->group(function () {
         Route::get('/', 'index')->name('accounts.index');
+        Route::post('/store', 'store')->name('accounts.store');
+        Route::post('/{id}/update', 'update')->name('accounts.update');
+        Route::delete('/{id}/delete', 'destroy')->name('accounts.destroy');
+
+        Route::get('/fetch-modal', 'fetchModalBody')->name('accounts.fetch-modal');
+        Route::post('/update-status', 'updateStatus')->name('accounts.update-status');
     });
 
     Route::prefix('supplier')->controller(SupplierController::class)->group(function() {
         Route::get('/', 'index')->name('supplier.index');
+        Route::post('/', 'store')->name('supplier.store');
+        Route::post('/update', 'update')->name('supplier.update');
+        Route::post('/remove', 'remove')->name('supplier.remove');
+
+        Route::get('/fetch-content', 'fetchContent')->name('supplier.fetch-content');
+        Route::get('/supplier-by-tin/{tin}', 'getByTin')->name('supplier.supplier-by-tin');
     });
 
-    Route::prefix('repor')->controller(ReportsController::class)->group(function() {
+    Route::prefix('report')->controller(ReportsController::class)->group(function() {
         Route::get('/', 'index')->name('reports.index');
+        Route::get('/fetch-content', 'fetchContent')->name('reports.fetch-content');
+        Route::get('/export', 'export')->name('report.export');
     });
 
 });

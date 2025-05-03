@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('account_titles', function (Blueprint $table) {
             $table->id();
+            $table->string('title');
+            $table->boolean('status')->default(1);
+            $table->text('description')->nullable();
+            $table->string('code')->unique();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

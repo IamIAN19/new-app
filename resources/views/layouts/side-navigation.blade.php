@@ -3,7 +3,7 @@
       <li class="nav-item nav-profile">
         <a href="#" class="nav-link">
           <div class="nav-profile-image">
-            <img src="assets/images/faces/face1.png" alt="profile" />
+            <img src="{{ asset('assets/images/faces/face1.png')  }}" alt="profile" />
             <span class="login-status online"></span>
             <!--change to offline or busy as needed-->
           </div>
@@ -19,8 +19,8 @@
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{{ route('invoice.create') }}">
-          <span class="menu-title">New Invoice</span>
+        <a class="nav-link" href="{{ route('invoices.index') }}">
+          <span class="menu-title">Invoice</span>
           <i class="mdi mdi-file menu-icon"></i>
         </a>
       </li>
@@ -36,7 +36,7 @@
                         <a class="nav-link" href="{{route('company.index')}}">Company</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{route('sales.index')}}">Sales</a>
+                        <a class="nav-link" href="{{route('sales.index')}}">Sales Category</a>
                     </li>
                     <li class="nav-item">
                     <a class="nav-link" href="{{route('accounts.index')}}">Account title</a>
