@@ -12,6 +12,10 @@ class Company extends Model
 
     protected $guarded = [];
 
+    public function scopeActive($query){
+        return $query->where('status', 1);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'created_by');

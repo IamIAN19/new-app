@@ -155,9 +155,9 @@
                                 <label for="department">Department</label>
                                 <select class="form-select" id="department" name="department_id">
                                     <option value="">Choose one</option>
-                                    <option value="1" {{ $invoice->department_id == 1 ? "selected" : "" }}>Sales</option>
-                                    <option value="2" {{ $invoice->department_id == 2 ? "selected" : "" }}>Purchases</option>
-                                    <option value="3" {{ $invoice->department_id == 3 ? "selected" : "" }}>Other Reports</option>
+                                    @foreach($departments as $d)
+                                        <option value="{{ $d->id }}" {{ $invoice->department_id == $d->id ? "selected" : "" }}>{{ $d->name }}</option>
+                                    @endforeach
                                 </select>
                                 <span class="error text-danger mt-1"></span>
                             </div>

@@ -44,6 +44,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{route('supplier.index')}}">Supplier</a>
                     </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{route('department.index')}}">Department</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{route('users.index')}}">Users</a>
+                    </li>
                 </ul>
             </div>
         </li>

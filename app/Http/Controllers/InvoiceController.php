@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AccountTitle;
 use App\Models\Company;
+use App\Models\Department;
 use App\Models\Invoice;
 use App\Models\InvoicesOtherExpenses;
 use App\Models\InvoiceSub;
@@ -25,11 +26,12 @@ class InvoiceController extends Controller
 
     public function create(){
 
-        $company        = Company::select('id', 'name')->get();
-        $sales_category = SalesCategory::select('id', 'name')->get();
-        $account_titles   = AccountTitle::with('subs')->get();
+        $company        = Company::select('id', 'name')->active()->get();
+        $sales_category = SalesCategory::select('id', 'name')->active()->get();
+        $account_titles = AccountTitle::with('subs')->active()->get();
+        $departments    = Department::select('id', 'name')->active()->get();
 
-        return view('invoice.create', compact('company', 'sales_category', 'account_titles'));
+        return view('invoice.create', compact('company', 'sales_category', 'account_titles', 'departments'));
     }
 
     public function store(Request $request){
@@ -168,11 +170,12 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice){
 
-        $company        = Company::select('id', 'name')->get();
-        $sales_category = SalesCategory::select('id', 'name')->get();
-        $account_titles   = AccountTitle::with('subs')->get();
+        $company        = Company::select('id', 'name')->active()->get();
+        $sales_category = SalesCategory::select('id', 'name')->active()->get();
+        $account_titles = AccountTitle::with('subs')->active()->get();
+        $departments    = Department::select('id', 'name')->active()->get();
 
-        return view('invoice.show', compact('company', 'sales_category', 'account_titles', 'invoice'));
+        return view('invoice.show', compact('company', 'sales_category', 'account_titles', 'invoice', 'departments'));
     }
 
     public function update(Request $request){

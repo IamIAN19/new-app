@@ -12,6 +12,10 @@ class AccountTitle extends Model
 
     protected $fillable = ['title', 'description', 'code', 'status', 'created_by', 'updated_by'];
 
+    public function scopeActive($query){
+        return $query->where('status', 1);
+    }
+
     public function subs()
     {
         return $this->hasMany(AccountSub::class);

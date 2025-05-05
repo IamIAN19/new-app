@@ -19,8 +19,13 @@
               <label for="exampleSelectGender">@lang('Select Report')</label>
               <select class="form-select" name="type" id="type" required style="height:45px;">
                   <option value="">Choose one</option>
+                  <option value="slsl">SLSP</option>
+                  <option value="disbursement">Disbursement</option>
+                  <option value="cash">Cash</option>
                   <option value="ledger">General Ledger</option>
-                  <option value="slsl">SLSL</option>
+                  <option value="journal">General Journal</option>
+                  <option value="financial_statement">Financial Statement</option>
+                  <option value="others">Other Reports</option>
               </select>
           </div>
           <!-- Date Filter Section -->

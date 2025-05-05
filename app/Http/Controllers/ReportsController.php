@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CashReportExport;
+use App\Exports\DisbursementReportExport;
 use App\Exports\LedgerReportExport;
 use App\Models\AccountSub;
 use App\Models\AccountTitle;
 use App\Models\Company;
+use App\Models\Department;
 use App\Models\Invoice;
 use App\Models\InvoicesOtherExpenses;
 use App\Models\InvoiceSub;
@@ -44,6 +47,12 @@ class ReportsController extends Controller
                 case 'slsl':
                     $html = view('reports.slsl')->render();
                     break;
+                case 'disbursement':
+                    $html = $this->getDisbursementReport($from, $to, $company);
+                    break;
+                case 'cash':
+                    $html = $this->getCashReport($from, $to, $company);
+                    break;
                 default:
                     $html = view('reports.ledger')->render();
             }
@@ -52,6 +61,58 @@ class ReportsController extends Controller
         }
 
         return abort(403, 'Unauthorized!');
+    }
+
+    private function getDisbursementReport($from, $to, $company){
+        // Get first the departments to use in condition
+        $sale_id = Department::where('name', 'Sales')->select('id')->first()->id;
+
+        $invoices = Invoice::with([
+            'invoiceOthers.accountTitle',
+            'invoiceOthers.invoiceSubs.accountSub',
+        ])
+        ->whereBetween('created_at', [$from, $to])
+        ->where('company_id', $company)
+        ->where('department_id', '!=', $sale_id)
+        ->paginate(100); // paginate for performance
+
+        return view('reports.disbursement', compact('invoices','from', 'to', 'company'))->render();
+    }
+
+    public function exportDisbursementReport(Request $request)
+    {
+        $company_name = Company::select('name')->find($request->company)->name;
+
+        // Get first the departments to use in condition
+        $sale_id = Department::where('name', 'Sales')->select('id')->first()->id;
+
+        return Excel::download(new DisbursementReportExport($request->from, $request->to, $request->company, $company_name, $sale_id), 'disbursement_report.xlsx');
+    }
+
+    private function getCashReport($from, $to, $company){
+        // Get first the departments to use in condition
+        $sale_id = Department::where('name', 'Sales')->select('id')->first()->id;
+
+        $invoices = Invoice::with([
+            'invoiceOthers.accountTitle',
+            'invoiceOthers.invoiceSubs.accountSub',
+        ])
+        ->whereBetween('created_at', [$from, $to])
+        ->where('company_id', $company)
+        ->where('department_id',  $sale_id)
+        ->paginate(100); // paginate for performance
+
+        return view('reports.cash', compact('invoices','from', 'to', 'company'))->render();
+    }
+
+    public function exportCashReport(Request $request)
+    {
+        $company_name = Company::select('name')->find($request->company)->name;
+
+        // Get first the departments to use in condition
+        $sale_id = Department::where('name', 'Sales')->select('id')->first()->id;
+
+        return Excel::download(new CashReportExport($request->from, $request->to, $request->company, $company_name, $sale_id), 'cash_report.xlsx');
     }
 
     private function getLedgerReport($from, $to, $company){

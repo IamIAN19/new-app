@@ -110,9 +110,9 @@
                                 <label for="department">Department</label>
                                 <select class="form-select" id="department" name="department_id">
                                     <option value="">Choose one</option>
-                                    <option value="1">Sales</option>
-                                    <option value="2">Purchases</option>
-                                    <option value="3">Other Reports</option>
+                                    @foreach($departments as $d)
+                                        <option value="{{ $d->id }}">{{ $d->name }}</option>
+                                    @endforeach
                                 </select>
                                 <span class="error text-danger mt-1"></span>
                             </div>

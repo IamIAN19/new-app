@@ -3,11 +3,14 @@
 use App\Http\Controllers\AccountTitleController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SalesCategoryController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\UserController;
+use App\Models\Department;
 use App\Models\SalesCategory;
 use Illuminate\Support\Facades\Route;
 
@@ -90,6 +93,26 @@ Route::middleware('auth')->group(function () {
         Route::get('/', 'index')->name('reports.index');
         Route::get('/fetch-content', 'fetchContent')->name('reports.fetch-content');
         Route::get('/export', 'export')->name('report.export');
+        Route::get('/export-disbursement', 'exportDisbursementReport')->name('report.export-disbursement');
+        Route::get('/export-cash', 'exportCashReport')->name('report.export-cash');
+    });
+
+    Route::prefix('deparment')->controller(DepartmentController::class)->group(function() {
+        Route::get('/', 'index')->name('department.index');
+        Route::post('/store', 'store')->name('department.store');
+        Route::get('/fetch-content', 'fetchContent')->name('department.fetch-content');
+        Route::post('/update', 'update')->name('department.update');
+        Route::post('/update-status', 'updateStatus')->name('department.update-status');
+    });
+
+    Route::prefix('users')->controller(UserController::class)->group(function() {
+        Route::get('/', 'index')->name('users.index');
+        Route::get('/list', 'list');
+        Route::post('/store', 'store');
+        Route::get('/edit/{id}', 'edit');
+        Route::post('/update/{id}', 'update');
+        Route::delete('/delete/{id}', 'destroy');
+        Route::post('/toggle-status/{id}', 'toggleStatus');
     });
 
 });
