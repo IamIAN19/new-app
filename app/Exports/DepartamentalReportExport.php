@@ -33,7 +33,7 @@ class DepartamentalReportExport implements FromCollection, WithHeadings, WithChu
     public function collection()
     {
         $this->data = Invoice::with(['invoiceOthers.accountTitle', 'invoiceOthers.invoiceSubs.accountSub'])
-            ->whereBetween('created_at', [$this->start, $this->end])
+            ->whereBetween('added_date', [$this->start, $this->end])
             ->where('company_id', $this->company)
             ->whereIn('department_id', $this->departments)
             ->get()
@@ -42,7 +42,7 @@ class DepartamentalReportExport implements FromCollection, WithHeadings, WithChu
                     if ($expense->has_child) {
                         return collect($expense->invoiceSubs)->map(function ($sub) use ($invoice, $expense) {
                             return [
-                                $invoice->created_at->format('Y-m-d'),
+                                $invoice->added_date->format('Y-m-d'),
                                 $invoice->voucher_no,
                                 $invoice->code,
                                 $expense->accountTitle->code.'-'.$sub->accountSub->code,
@@ -54,7 +54,7 @@ class DepartamentalReportExport implements FromCollection, WithHeadings, WithChu
                         });
                     } else {
                         return [[
-                            $invoice->created_at->format('Y-m-d'),
+                            $invoice->added_date->format('Y-m-d'),
                             $invoice->voucher_no,
                             $invoice->code,
                             $expense->accountTitle->code,

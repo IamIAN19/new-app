@@ -33,7 +33,7 @@ class SlspReportExport implements FromCollection, WithHeadings, WithChunkReading
     public function collection()
     {
         $invoices = Invoice::with(['supplierData', 'category'])
-            ->whereBetween('created_at', [$this->start, $this->end])
+            ->whereBetween('added_date', [$this->start, $this->end])
             ->where('company_id', $this->company)
             ->whereIn('department_id', $this->departments)
             ->get();

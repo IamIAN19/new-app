@@ -46,7 +46,7 @@ class JournalReportExport implements FromQuery, WithHeadings, WithMapping, WithE
             ->leftJoin('invoice_subs as sub', 'sub.invoice_other_expenses_id', '=', 'ioe.id')
             ->leftJoin('account_sub as a_sub', 'a_sub.id', '=', 'sub.account_sub_id')
             ->selectRaw('
-                DATE_FORMAT(inv.created_at, "%b %e") as date,
+                DATE_FORMAT(inv.added_date, "%b %e") as date,
                 IF(ioe.has_child = 1, CONCAT(at.code, "-", a_sub.code), at.code) as account_code,
                 IF(ioe.has_child = 1, a_sub.name, at.title) as account_title,
                 inv.voucher_no as ref_no,
@@ -54,10 +54,10 @@ class JournalReportExport implements FromQuery, WithHeadings, WithMapping, WithE
                 IF(ioe.has_child = 1, sub.debit, ioe.debit) as debit,
                 IF(ioe.has_child = 1, sub.credit, ioe.credit) as credit
             ')
-            ->whereBetween('inv.created_at', [$this->start, $this->end])
+            ->whereBetween('inv.added_date', [$this->start, $this->end])
             ->where('inv.company_id', $this->company)
             ->whereIn('inv.department_id', $this->departments)
-            ->orderBy('inv.created_at');
+            ->orderBy('inv.added_date');
     }
 
     public function headings(): array

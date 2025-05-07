@@ -22,7 +22,7 @@ class ReportService
         $end = $to;
         
         $invoices = Invoice::with(['supplierData', 'category'])
-            ->whereBetween('created_at', [$start, $end])
+            ->whereBetween('added_date', [$start, $end])
             ->where('company_id', $company)
             ->whereIn('department_id', $departments)
             ->get();
@@ -75,7 +75,7 @@ class ReportService
             'invoiceOthers.accountTitle',
             'invoiceOthers.invoiceSubs.accountSub',
         ])
-        ->whereBetween('created_at', [$from, $to])
+        ->whereBetween('added_date', [$from, $to])
         ->where('company_id', $company)
         ->whereIn('department_id', $departments)
         ->paginate(100); // paginate for performance
@@ -85,32 +85,15 @@ class ReportService
 
     public function getGeneralJournalReports($from, $to, $company, $departments){
 
-        // $invoices = DB::table('invoices_other_expenses as io')
-        //     ->join('invoices as i', 'i.id', '=', 'io.invoice_id')
-        //     ->join('account_titles as at', 'at.id', '=', 'io.account_title_id')
-        //     ->whereBetween('i.created_at', [$from, $to])
-        //     ->where('i.company_id', $company)
-        //     ->whereIn('i.department_id', $departments)
-        //     ->select(
-        //         'i.created_at',
-        //         'i.voucher_no',
-        //         'at.title as account_title',
-        //         'at.code as account_title_code',
-        //         'io.debit',
-        //         'io.credit'
-        //     )
-        //     ->orderBy('i.created_at')
-        //     ->paginate(100); // adjust page size for performance
-
         $parentRows = DB::table('invoices_other_expenses as ioe')
             ->join('account_titles as at', 'ioe.account_title_id', '=', 'at.id')
             ->join('invoices as inv', 'ioe.invoice_id', '=', 'inv.id')
             ->where('ioe.has_child', 0)
-            ->whereBetween('inv.created_at', [$from, $to])
+            ->whereBetween('inv.added_date', [$from, $to])
             ->where('inv.company_id', $company)
             ->whereIn('inv.department_id', $departments)
             ->select([
-                DB::raw('DATE_FORMAT(inv.created_at, "%b %e") as date'),
+                DB::raw('DATE_FORMAT(inv.added_date, "%b %e") as date'),
                 'at.code as account_code',
                 'at.title as account_title',
                 'inv.voucher_no as ref_no',
@@ -125,11 +108,11 @@ class ReportService
             ->join('account_titles as at', 'ioe.account_title_id', '=', 'at.id')
             ->join('invoices as inv', 'ioe.invoice_id', '=', 'inv.id')
             ->where('ioe.has_child', 1)
-            ->whereBetween('inv.created_at', [$from, $to])
+            ->whereBetween('inv.added_date', [$from, $to])
             ->where('inv.company_id', $company)
             ->whereIn('inv.department_id', $departments)
             ->select([
-                DB::raw('DATE_FORMAT(inv.created_at, "%b %e") as date'),
+                DB::raw('DATE_FORMAT(inv.added_date, "%b %e") as date'),
                 DB::raw('CONCAT(at.code, "-", sub.code) as account_code'), // 👈 here
                 'sub.name as account_title',
                 'inv.voucher_no as ref_no',
@@ -151,7 +134,7 @@ class ReportService
     public function getLedgerReport($from, $to, $company, $departments){
 
         $invoice_ids = Invoice::where('company_id', $company)
-            ->whereBetween('created_at', [$from, $to])
+            ->whereBetween('added_date', [$from, $to])
             ->whereIn('department_id', $departments)
             ->pluck('id')
             ->toArray();
@@ -167,7 +150,6 @@ class ReportService
             )
             ->where('has_child', 0)
             ->whereIn('invoice_id', $invoice_ids)
-            // ->whereBetween('created_at', [$from, $to])
             ->groupBy('account_title_id')
             ->get()
             ->keyBy('account_title_id');
@@ -180,7 +162,6 @@ class ReportService
             )
             ->join('invoices_other_expenses', 'invoice_subs.invoice_other_expenses_id', '=', 'invoices_other_expenses.id')
             ->whereIn('invoices_other_expenses.invoice_id', $invoice_ids)
-            // ->whereBetween('invoices_other_expenses.created_at', [$from, $to])
             ->groupBy('invoice_subs.account_sub_id')
             ->get()
             ->map(function ($sub) use ($accountSubsMap) {
@@ -207,7 +188,7 @@ class ReportService
     //         'invoiceOthers.accountTitle',
     //         'invoiceOthers.invoiceSubs.accountSub',
     //     ])
-    //     ->whereBetween('created_at', [$from, $to])
+    //     ->whereBetween('added_date', [$from, $to])
     //     ->where('company_id', $company)
     //     ->whereIn('department_id', [3,4])
     //     ->paginate(100); // paginate for performance
@@ -223,7 +204,7 @@ class ReportService
     //         'invoiceOthers.accountTitle',
     //         'invoiceOthers.invoiceSubs.accountSub',
     //     ])
-    //     ->whereBetween('created_at', [$from, $to])
+    //     ->whereBetween('added_date', [$from, $to])
     //     ->where('company_id', $company)
     //     ->where('department_id',  $sale_id)
     //     ->paginate(100); // paginate for performance
@@ -237,7 +218,7 @@ class ReportService
     //         'invoiceOthers.accountTitle',
     //         'invoiceOthers.invoiceSubs.accountSub',
     //     ])
-    //     ->whereBetween('created_at', [$from, $to])
+    //     ->whereBetween('added_date', [$from, $to])
     //     ->where('company_id', $company)
     //     ->whereIn('department_id', [2])
     //     ->paginate(100); // paginate for performance

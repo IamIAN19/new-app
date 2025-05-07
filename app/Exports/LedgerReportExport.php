@@ -43,7 +43,11 @@ class LedgerReportExport implements FromCollection, WithHeadings, WithMapping, W
 
     public function prepareData()
     {
-        $invoice_ids = Invoice::where('company_id', $this->company)->pluck('id')->toArray();
+        $invoice_ids = Invoice::where('company_id', $this->company)
+            ->whereBetween('added_date', [$this->from, $this->to])
+            ->whereIn('department_id', $this->departments)
+            ->pluck('id')
+            ->toArray();
 
         $accountSubsMap = AccountSub::select('id', 'name', 'account_title_id')->get()->keyBy('id');
 
@@ -55,7 +59,6 @@ class LedgerReportExport implements FromCollection, WithHeadings, WithMapping, W
             )
             ->where('has_child', 0)
             ->whereIn('invoice_id', $invoice_ids)
-            ->whereBetween('created_at', [$this->from, $this->to])
             ->groupBy('account_title_id')
             ->get()
             ->keyBy('account_title_id');
@@ -68,7 +71,6 @@ class LedgerReportExport implements FromCollection, WithHeadings, WithMapping, W
             )
             ->join('invoices_other_expenses', 'invoice_subs.invoice_other_expenses_id', '=', 'invoices_other_expenses.id')
             ->whereIn('invoices_other_expenses.invoice_id', $invoice_ids)
-            ->whereBetween('invoices_other_expenses.created_at', [$this->from, $this->to])
             ->groupBy('invoice_subs.account_sub_id')
             ->get()
             ->map(function ($sub) use ($accountSubsMap) {
