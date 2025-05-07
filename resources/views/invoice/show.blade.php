@@ -105,51 +105,10 @@
                                 </div>
                             </div>
                         </div>
-                        {{-- <div class="form-group">
-                            <label for="sales_category">Sale Category</label>
-                            <select class="form-select" id="sales_category" name="sales_category">
-                                <option value="">Choose one</option>
-                                @foreach($sales_category as $sc)
-                                    <option value="{{ $sc->id }}" {{ $invoice->sales_category_id == $sc->id ? "selected" : "" }}>{{ $sc->name }}</option>
-                                @endforeach
-                            </select>
-                            <span class="error text-danger mt-1"></span>
-                        </div> --}}
                     </div>
                 </div>
                 <div class="card mb-2">
                     <div class="card-body">
-                        {{-- <div class="d-flex">
-                            <div class="form-group">
-                                <input type="checkbox" class="" id="is_vatable" name="is_vatable" placeholder="" {{ $invoice->vat_tax_amount <> null ? "checked" : "" }}> 
-                                <label for="is_vatable">Vatable</label>
-                            </div>
-                        </div> --}}
-                        {{-- <div class="row {{ $invoice->vat_tax_amount <> null ? "" : "d-none" }}" id="taxable-section">
-                            <div class="form-group col-md-6">
-                                <label for="taxable_amount">Taxable amount:</label>
-                                <input type="text" class="form-control" value="{{ $invoice->vat_tax_amount }}" id="taxable_amount" name="taxable_amount" placeholder="">
-                                <span class="error text-danger mt-1"></span>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="percentage">Percentage(%):</label>
-                                <input type="text" class="form-control" value="{{ $invoice->vat_tax_percentage }}" id="percentage" name="percentage" placeholder="">
-                                <span class="error text-danger mt-1"></span>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-group col-md-6">
-                                <label for="vat_exempt">Vat Exempt</label>
-                                <input type="text" class="form-control" value="{{ $invoice->vat_exempt }}" id="vat_exempt" name="vat_exempt" placeholder="">
-                                <span class="error text-danger mt-1"></span>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="zero_rated">Zero rated</label>
-                                <input type="text" name="zero_rated" value="{{ $invoice->vat_zero_rated }}" class="form-control" id="zero_rated" placeholder="">
-                                <span class="error text-danger mt-1"></span>
-                            </div>
-                        </div> --}}
-
                         <div class="row">
                             <div class="form-group col-md-6">
                                 <label for="department">Department</label>
@@ -225,6 +184,24 @@
                                 @endforeach
                             @endif
                         </div>
+                        <div class="{{ $invoice->invoiceOthers->count() > 0 ? "" : "d-none" }} totalDebitCreditSection">
+                            <div class="row ms-2 border-start ps-3">
+                                <div class="form-group col-3">
+                                </div>
+                                <div class="form-group col-1">
+                                </div>
+                                <div class="form-group col-4 mb-0">
+                                </div>
+                                <div class="form-group col-2 mb-0">
+                                    <label for="">Total Debit</label>
+                                    <input type="text" value="" id="total_debit" class="form-control readonly" readonly>
+                                </div>
+                                <div class="form-group col-2">
+                                    <label>Total Credit</label>
+                                    <input type="text" class="form-control readonly" id="total_credit" readonly>
+                                </div>
+                            </div>
+                        </div>
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-gradient-primary me-2">Submit</button>
                             <a href="/invoices" class="btn btn-light">Cancel</a>
@@ -241,6 +218,28 @@
         <script>
             $(document).ready(function(){
                 $('select[data-toggle="select2"]').select2();
+
+                const computeTotalDebitCredit = () => {
+                    let totalDebit = 0;
+                    let totalCredit = 0;
+
+                    document.querySelectorAll('.debit-field').forEach(element => {
+                        const value = parseFloat(element.value.trim()) || 0;
+                        totalDebit += value;
+                    });
+
+                    document.querySelectorAll('.credit-field').forEach(element => {
+                        const value = parseFloat(element.value.trim()) || 0;
+                        totalCredit += value;
+                    });
+
+                    $('#total_debit').val(totalDebit.toFixed(2));
+                    $('#total_credit').val(totalCredit.toFixed(2));
+                }
+
+                $(document).on('input', '.credit-field, .debit-field', function(){
+                    computeTotalDebitCredit();
+                });
 
                 $(document).on('input', '#taxable_amount', function(){
                     let value = ( $(this).val() * 0.12 );
@@ -263,14 +262,16 @@
                     let input = $('#input_output').val();
                     let zero  = $('#zero_rated').val();
                     let vat   = $('#vat_exempt').val();
+                    let tax_amount = $('#taxable_amount').val();
 
-                    let total = parseFloat(input || 0) + parseFloat(zero || 0) + parseFloat(vat || 0);
+                    let total = parseFloat(input || 0) + parseFloat(zero || 0) + parseFloat(vat || 0) + parseFloat(tax_amount || 0);
 
                     $('#total_invoice').val( total.toFixed(2) );
                 }
                 
                 computeInputOutput();
                 computeTotalInvoice();
+                computeTotalDebitCredit();
 
                 $('#tin').on('blur', function () {
                     const tin = $(this).val().trim();
@@ -321,6 +322,16 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             $(_this).parent('div').remove();
+
+                            // Check account title section if there's still a card
+                            let accountCount = $('.account_title_section').children().length;
+                            if( accountCount < 1  ){
+                                $('#total_debit').val(0);
+                                $('#total_credit').val(0);
+                                $('.totalDebitCreditSection').addClass('d-none');
+                            }else{
+                                computeTotalDebitCredit();
+                            }
                         } 
                     });
                 })
@@ -396,6 +407,9 @@
                         dataType: 'json',
                         success: function (response){
                             $('.account_title_section').append( response.html );
+
+                            // Display the total debit credit section
+                            $('.totalDebitCreditSection').removeClass('d-none')
                         },
                         error: function (XMLHttpRequest, textStatus, errorThrown) {
                             popupMessage('Error', 'Failed!', 'error');

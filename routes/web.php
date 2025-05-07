@@ -95,6 +95,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/export', 'export')->name('report.export');
         Route::get('/export-disbursement', 'exportDisbursementReport')->name('report.export-disbursement');
         Route::get('/export-cash', 'exportCashReport')->name('report.export-cash');
+        Route::get('/export-purchases', 'exportPurchasesReport')->name('report.export-purchases');
+        Route::get('/export-slsp', 'exportSlspReport')->name('report.export-slsp');
+        Route::get('/export-departamental', 'exportDepartamentalReport')->name('report.export-departamental');
+        Route::get('/export-journal', 'exportGeneralJournalReport')->name('report.export-journal');
     });
 
     Route::prefix('deparment')->controller(DepartmentController::class)->group(function() {

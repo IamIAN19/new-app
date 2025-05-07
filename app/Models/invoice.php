@@ -44,8 +44,18 @@ class Invoice extends Model
         return $this->belongsTo(Supplier::class, 'tin', 'tin');
     }
 
+    public function supplierData()
+    {
+        return $this->belongsTo(Supplier::class, 'tin', 'tin');
+    }
+
     public function invoiceOthers()
     {
         return $this->hasMany(InvoicesOtherExpenses::class, 'invoice_id');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(SalesCategory::class, 'sales_category_id');
     }
 }

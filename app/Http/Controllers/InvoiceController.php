@@ -78,12 +78,14 @@ class InvoiceController extends Controller
                     $totalComputation = 0;
                     
                     $inputOutputVat = 0;
+                    $tax_amount = 0;
                     // Net vat computation for tax
                     if($request->taxable_amount ){
                         $inputOutputVat = ($request->taxable_amount * .12);
+                        $tax_amount = $request->taxable_amount;
                     }
 
-                    $totalComputation = ($request->zero_rated + $request->vat_exempt + $inputOutputVat );
+                    $totalComputation = ($request->zero_rated + $request->vat_exempt + $inputOutputVat + $tax_amount );
                     $invoice->total_amount = number_format($totalComputation,2);
                     $invoice->company_id = $request->company_id;
                     $invoice->user_id = Auth::user()->id;
@@ -231,23 +233,17 @@ class InvoiceController extends Controller
                     $invoice->classification = $request->classification;
                     $invoice->added_date = $request->added_date;
 
-                    // $vatComputation   = 0;
                     $totalComputation = 0;
-                    
-                    // if( $request->filled('is_vatable') ){
-                    //     $invoice->vat_tax_amount = $request->taxable_amount;
-                    //     $invoice->vat_tax_percentage = $request->percentage;
-
-                    //     $vatComputation = ($request->taxable_amount * ($request->percentage / 100));
-                    // }
-                    
                     $inputOutputVat = 0;
+                    $tax_amount = 0;
                     // Net vat computation for tax
                     if($request->taxable_amount ){
                         $inputOutputVat = ($request->taxable_amount * .12);
+                        $tax_amount = $request->taxable_amount;
                     }
 
-                    $totalComputation = ($request->zero_rated + $request->vat_exempt + $inputOutputVat );
+                    $totalComputation = ($request->zero_rated + $request->vat_exempt + $inputOutputVat + $tax_amount );
+
 
                     $invoice->total_amount = number_format($totalComputation,2);
 

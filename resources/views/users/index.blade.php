@@ -46,7 +46,7 @@
 
                 <div class="form-group mb-2">
                     <label>Password</label>
-                    <input type="text" class="form-control" name="raw_password" id="raw_password" required>
+                    <input type="password" class="form-control" name="raw_password" id="raw_password" required>
                     <span class="error text-danger mt-1"></span>
                 </div>
             </form>

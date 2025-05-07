@@ -19,13 +19,12 @@ class CashReportExport implements FromCollection, WithHeadings, WithChunkReading
     protected $source = 'From Sales Department';
     protected $saleId;
 
-    public function __construct($start, $end, $company, $companyName, $saleId)
+    public function __construct($start, $end, $company, $companyName)
     {
         $this->start = $start;
         $this->end = $end;
         $this->company = $company;
         $this->companyName = $companyName;
-        $this->saleId = $saleId;
     }
 
     public function collection()
@@ -33,7 +32,7 @@ class CashReportExport implements FromCollection, WithHeadings, WithChunkReading
         $this->data = Invoice::with(['invoiceOthers.accountTitle', 'invoiceOthers.invoiceSubs.accountSub'])
             ->whereBetween('created_at', [$this->start, $this->end])
             ->where('company_id', $this->company)
-            ->where('department_id', $this->saleId)
+            ->where('department_id', 1)
             ->get()
             ->flatMap(function ($invoice) {
                 return collect($invoice->invoiceOthers)->flatMap(function ($expense) use ($invoice) {

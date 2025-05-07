@@ -11,12 +11,12 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class DisbursementReportExport implements FromCollection, WithHeadings, WithChunkReading, WithEvents, WithStyles
+class PurchasesExportReport implements FromCollection, WithHeadings, WithChunkReading, WithEvents, WithStyles
 {
     protected $start, $end, $company;
     protected $data;
     protected $companyName = '';
-    protected $source = 'From All department';
+    protected $source = 'From Purchases Department';
 
     public function __construct($start, $end, $company, $companyName)
     {
@@ -31,7 +31,7 @@ class DisbursementReportExport implements FromCollection, WithHeadings, WithChun
         $this->data = Invoice::with(['invoiceOthers.accountTitle', 'invoiceOthers.invoiceSubs.accountSub'])
             ->whereBetween('created_at', [$this->start, $this->end])
             ->where('company_id', $this->company)
-            ->whereIn('department_id', [3,4])
+            ->where('department_id', 2)
             ->get()
             ->flatMap(function ($invoice) {
                 return collect($invoice->invoiceOthers)->flatMap(function ($expense) use ($invoice) {
@@ -75,7 +75,7 @@ class DisbursementReportExport implements FromCollection, WithHeadings, WithChun
 
         return $this->data;
     }
-
+    
     public function headings(): array
     {
         return ['DATE', 'REF. NO.', 'SEQUENCE NO.', 'ACCOUNT CODE', 'ACCOUNT TITLE', 'PARTICULARS', 'DEBIT', 'CREDIT'];
@@ -96,7 +96,7 @@ class DisbursementReportExport implements FromCollection, WithHeadings, WithChun
                 $sheet->insertNewRowBefore(1, 3);
 
                 $sheet->setCellValue('A1', $this->companyName);
-                $sheet->setCellValue('A2', 'Disbursement Report');
+                $sheet->setCellValue('A2', 'Cash Report');
 
                 $dateRange = strtoupper(date('F j', strtotime($this->start)) . ' TO ' . date('F j', strtotime($this->end)));
                 $sheet->setCellValue('A3', "Date: {$dateRange}, Source: {$this->source}");
@@ -126,5 +126,3 @@ class DisbursementReportExport implements FromCollection, WithHeadings, WithChun
         ];
     }
 }
-
-

@@ -14,7 +14,7 @@
                 <td>{{ $user->name }}</td>
                 <td>{{ $user->email }}</td>
                 <td>
-                {{ $user->raw_password }}
+                    *********
                     <button class="btn btn-sm btn-outline-secondary btn-copy" data-text="{{ $user->raw_password }}">
                         Copy
                     </button>

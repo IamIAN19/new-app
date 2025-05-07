@@ -127,12 +127,6 @@
                                 <span class="error text-danger mt-1"></span>
                             </div>
                         </div>
-                        {{-- <div class="d-flex">
-                            <div class="form-group">
-                                <input type="checkbox" class="" id="is_vatable" name="is_vatable" placeholder=""> 
-                                <label for="is_vatable">Vatable</label>
-                            </div>
-                        </div> --}}
                         <div class="row" id="taxable-section">
                             <div class="form-group col-md-2">
                                 <label for="taxable_amount">Net of Vat:</label>
@@ -160,20 +154,7 @@
                                 <span class="error text-danger mt-1"></span>
                             </div>
                             <input type="hidden" class="form-control" id="percentage" name="percentage" placeholder="" value="12">
-                            {{-- <div class="form-group col-md-6">
-                                <label for="percentage">Percentage(%):</label>
-                                <input type="text" class="form-control" id="percentage" name="percentage" placeholder="" value="12">
-                                <span class="error text-danger mt-1"></span>
-                            </div> --}}
                         </div>
-                        {{-- <div class="row">
-                            <div class="form-group col-md-6">
-                                <label for="vat_exempt">Vat Exempt</label>
-                                <input type="text" class="form-control" id="vat_exempt" name="vat_exempt" placeholder="">
-                                <span class="error text-danger mt-1"></span>
-                            </div>
-                       
-                        </div> --}}
                     </div>
                 </div>
                 <div class="card mb-2">
@@ -193,7 +174,24 @@
                             </div>
                         </div>
                         <div class="account_title_section my-2">
-                       
+                        </div>
+                        <div class="d-none totalDebitCreditSection">
+                            <div class="row ms-2 border-start ps-3">
+                                <div class="form-group col-3">
+                                </div>
+                                <div class="form-group col-1">
+                                </div>
+                                <div class="form-group col-4 mb-0">
+                                </div>
+                                <div class="form-group col-2 mb-0">
+                                    <label for="">Total Debit</label>
+                                    <input type="text" value="" id="total_debit" class="form-control readonly" readonly>
+                                </div>
+                                <div class="form-group col-2">
+                                    <label>Total Credit</label>
+                                    <input type="text" class="form-control readonly" id="total_credit" readonly>
+                                </div>
+                            </div>
                         </div>
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-gradient-primary me-2">Submit</button>
@@ -212,6 +210,28 @@
             $(document).ready(function(){
                 $('select[data-toggle="select2"]').select2();
 
+                const computeTotalDebitCredit = () => {
+                    let totalDebit = 0;
+                    let totalCredit = 0;
+
+                    document.querySelectorAll('.debit-field').forEach(element => {
+                        const value = parseFloat(element.value.trim()) || 0;
+                        totalDebit += value;
+                    });
+
+                    document.querySelectorAll('.credit-field').forEach(element => {
+                        const value = parseFloat(element.value.trim()) || 0;
+                        totalCredit += value;
+                    });
+
+                    $('#total_debit').val(totalDebit.toFixed(2));
+                    $('#total_credit').val(totalCredit.toFixed(2));
+                }
+
+                $(document).on('input', '.credit-field, .debit-field', function(){
+                    computeTotalDebitCredit();
+                });
+
                 $(document).on('input', '#taxable_amount', function(){
                     let value = ( $(this).val() * 0.12 );
                     $('#input_output').val(value.toFixed(2));
@@ -226,8 +246,9 @@
                     let input = $('#input_output').val();
                     let zero  = $('#zero_rated').val();
                     let vat   = $('#vat_exempt').val();
+                    let tax_amount = $('#taxable_amount').val();
 
-                    let total = parseFloat(input || 0) + parseFloat(zero || 0) + parseFloat(vat || 0);
+                    let total = parseFloat(input || 0) + parseFloat(zero || 0) + parseFloat(vat || 0) + parseFloat(tax_amount || 0);
 
                     $('#total_invoice').val( total.toFixed(2) );
                 }
@@ -281,18 +302,18 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             $(_this).parent('div').remove();
+
+                            // Check account title section if there's still a card
+                            let accountCount = $('.account_title_section').children().length;
+                            if( accountCount < 1  ){
+                                $('#total_debit').val(0);
+                                $('#total_credit').val(0);
+                                $('.totalDebitCreditSection').addClass('d-none');
+                            }else{
+                                computeTotalDebitCredit();
+                            }
                         } 
                     });
-                })
-
-                $(document).on('click', '#is_vatable', function(){
-                    if( $(this).is(':checked') ){
-                        $('#taxable-section').removeClass('d-none');
-                    }else{
-                        $('#taxable-section').addClass('d-none');
-                        $('#taxable_amount').val('');
-                        $('#percentage').val(12);
-                    }
                 })
 
                 $(document).on('click', '.btnAddAccount', function(){
@@ -356,6 +377,8 @@
                         dataType: 'json',
                         success: function (response){
                             $('.account_title_section').append( response.html );
+                               // Display the total debit credit section
+                               $('.totalDebitCreditSection').removeClass('d-none')
                         },
                         error: function (XMLHttpRequest, textStatus, errorThrown) {
                             popupMessage('Error', 'Failed!', 'error');

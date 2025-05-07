@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\Department;
 use App\Models\Invoice;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -11,19 +12,22 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class DisbursementReportExport implements FromCollection, WithHeadings, WithChunkReading, WithEvents, WithStyles
+class DepartamentalReportExport implements FromCollection, WithHeadings, WithChunkReading, WithEvents, WithStyles
 {
     protected $start, $end, $company;
     protected $data;
     protected $companyName = '';
-    protected $source = 'From All department';
+    protected $source = '';
+    protected $saleId;
+    protected $departments;
 
-    public function __construct($start, $end, $company, $companyName)
+    public function __construct($start, $end, $company, $companyName, $departments)
     {
         $this->start = $start;
         $this->end = $end;
         $this->company = $company;
         $this->companyName = $companyName;
+        $this->departments = $departments;
     }
 
     public function collection()
@@ -31,7 +35,7 @@ class DisbursementReportExport implements FromCollection, WithHeadings, WithChun
         $this->data = Invoice::with(['invoiceOthers.accountTitle', 'invoiceOthers.invoiceSubs.accountSub'])
             ->whereBetween('created_at', [$this->start, $this->end])
             ->where('company_id', $this->company)
-            ->whereIn('department_id', [3,4])
+            ->whereIn('department_id', $this->departments)
             ->get()
             ->flatMap(function ($invoice) {
                 return collect($invoice->invoiceOthers)->flatMap(function ($expense) use ($invoice) {
@@ -88,6 +92,10 @@ class DisbursementReportExport implements FromCollection, WithHeadings, WithChun
 
     public function registerEvents(): array
     {
+        $sourceData = Department::whereIn('id', $this->departments)->select('name')->get()->pluck('name')->toArray();
+    
+        $this->source = implode(',',$sourceData);
+
         return [
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
@@ -96,7 +104,7 @@ class DisbursementReportExport implements FromCollection, WithHeadings, WithChun
                 $sheet->insertNewRowBefore(1, 3);
 
                 $sheet->setCellValue('A1', $this->companyName);
-                $sheet->setCellValue('A2', 'Disbursement Report');
+                $sheet->setCellValue('A2', 'Cash Report');
 
                 $dateRange = strtoupper(date('F j', strtotime($this->start)) . ' TO ' . date('F j', strtotime($this->end)));
                 $sheet->setCellValue('A3', "Date: {$dateRange}, Source: {$this->source}");
@@ -126,5 +134,3 @@ class DisbursementReportExport implements FromCollection, WithHeadings, WithChun
         ];
     }
 }
-
-

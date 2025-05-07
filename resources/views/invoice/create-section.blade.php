@@ -21,12 +21,12 @@
             </div>
             <div class="form-group col-2 mb-0">
                 <label for="">Debit</label>
-                <input type="text" value="" name="account[{{ $time }}][debit]" class="form-control">
+                <input type="text" value="" name="account[{{ $time }}][debit]" class="form-control debit-field">
             </div>
             <div class="form-group col-2 mb-0">
                 <label for="">Credit</label>
                 <input type="hidden" value="{{ $account->id }}" name="account[{{ $time }}][title_id]" class="form-control">
-                <input type="text" value="" name="account[{{ $time }}][credit]" class="form-control">
+                <input type="text" value="" name="account[{{ $time }}][credit]" class="form-control credit-field">
             </div>
         </div>
     </div>
@@ -78,11 +78,11 @@
                     </div>
                     <div class="form-group col-2 mb-0">
                         <label for="">Debit</label>
-                        <input type="text" value="" name="account[{{ $time }}][sub][{{ $value->id }}][debit]" class="form-control">
+                        <input type="text" value="" name="account[{{ $time }}][sub][{{ $value->id }}][debit]" class="form-control debit-field">
                     </div>
                     <div class="form-group col-2">
                         <label>Credit</label>
-                        <input type="text" name="account[{{ $time }}][sub][{{ $value->id }}][credit]" class="form-control">
+                        <input type="text" name="account[{{ $time }}][sub][{{ $value->id }}][credit]" class="form-control credit-field">
                         <input type="hidden" value="{{ $value->id }}" name="account[{{ $time }}][sub][{{ $value->id }}][id]" class="form-control">
                     </div>
                 </div>
