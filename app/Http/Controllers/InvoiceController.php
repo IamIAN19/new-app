@@ -41,7 +41,7 @@ class InvoiceController extends Controller
         if($request->ajax()){
 
             $validator = Validator::make($request->all(), [
-                'number' => 'required|numeric|unique:invoices,number',
+                'number' => 'required|unique:invoices,number',
                 'tin' => 'required|numeric',
                 'supplier_name' => 'required',
                 'classification' => 'required',
@@ -190,7 +190,6 @@ class InvoiceController extends Controller
                 'id'    => 'required',
                 'number' => [
                     'required',
-                    'numeric',
                     Rule::unique('invoices', 'number')->ignore($request->id),
                 ],
                 'tin' => 'required|numeric',
