@@ -13,6 +13,11 @@ class Invoice extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'added_date' => 'date',
+        'total_amount' => 'float',
+    ];
+
     protected static function booted()
     {
         static::creating(function ($invoice) {

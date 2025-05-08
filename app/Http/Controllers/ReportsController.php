@@ -85,6 +85,8 @@ class ReportsController extends Controller
 
     public function exportSlspReport(Request $request)
     {
+        ini_set('memory_limit', '512M');
+
         $company_name = Company::select('name')->find($request->company)->name;
 
         $departments = json_decode($request->departments);
@@ -94,6 +96,8 @@ class ReportsController extends Controller
 
     public function exportDepartamentalReport(Request $request)
     {
+        ini_set('memory_limit', '512M');
+
         $company_name = Company::select('name')->find($request->company)->name;
 
         $departments = json_decode($request->departments);
@@ -103,6 +107,8 @@ class ReportsController extends Controller
 
     public function exportGeneralJournalReport(Request $request)
     {
+        ini_set('memory_limit', '512M');
+
         $company_name = Company::select('name')->find($request->company)->name;
 
         $departments = json_decode($request->departments);
@@ -112,6 +118,8 @@ class ReportsController extends Controller
 
     public function export(Request $request)
     {
+        ini_set('memory_limit', '512M');
+
         $company_name = Company::select('name')->find($request->company)->name;
 
         $departments = json_decode($request->departments);

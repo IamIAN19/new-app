@@ -1,4 +1,7 @@
 <div class="table-responsive">
+  <p class="mb-3">
+    Showing {{ $invoices->firstItem() }} to {{ $invoices->lastItem() }} of {{ $invoices->total() }} entries
+  </p>
   <table class="table table-bordered text-center align-middle">
       <thead>
         <tr>
@@ -22,7 +25,7 @@
                   <td>₱{{ number_format($invoice->total_amount,2) }}</td>
                   <td>{{ $invoice->supplier }}</td>
                   <td>{{ $invoice->user->name }}</td>
-                  <td>{{ \Carbon\Carbon::parse($invoice->created_at)->format('Y F G h:i') }}</td>
+                  <td>{{ \Carbon\Carbon::parse($invoice->added_date)->format('Y-m-d') }}</td>
                   <td>{{ $invoice->updatedBy->name ?? "-" }}</td>
                   <td data-id="{{ $invoice->id }}">
                       <a href="/invoices/{{ $invoice->id }}/show" class="btn btn-sm btn-secondary btn-edit">

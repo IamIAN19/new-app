@@ -15,13 +15,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 class InvoiceController extends Controller
 {
     public function index(){
         $invoices = Invoice::with('company', 'supplier', 'user', 'updatedBy')->orderByDesc('id')->paginate(20);
+        $company = Company::select('id', 'name')->get();
+        $departments = Department::select('id', 'name')->get();
 
-        return view('invoice.index', compact('invoices'));
+        return view('invoice.index', compact('invoices', 'company', 'departments'));
     }
 
     public function create(){
@@ -86,7 +89,7 @@ class InvoiceController extends Controller
                     }
 
                     $totalComputation = ($request->zero_rated + $request->vat_exempt + $inputOutputVat + $tax_amount );
-                    $invoice->total_amount = number_format($totalComputation,2);
+                    $invoice->total_amount = $totalComputation;
                     $invoice->company_id = $request->company_id;
                     $invoice->user_id = Auth::user()->id;
 
@@ -107,7 +110,7 @@ class InvoiceController extends Controller
                                 ]);
 
                                 foreach( $val['sub'] as $sub ){
-                                    $debitCredit = ( ($val['debit'] ?? 0) + ($val['credit'] ?? 0) );
+                                    $debitCredit = ( ($sub['debit'] ?? 0) + ($sub['credit'] ?? 0) );
                                     $additional_amount += $debitCredit;
                                     InvoiceSub::create([
                                         'invoice_other_expenses_id' => $otherExpense->id,
@@ -245,7 +248,7 @@ class InvoiceController extends Controller
                     $totalComputation = ($request->zero_rated + $request->vat_exempt + $inputOutputVat + $tax_amount );
 
 
-                    $invoice->total_amount = number_format($totalComputation,2);
+                    $invoice->total_amount = $totalComputation;
 
                     $invoice->company_id = $request->company_id;
                     $invoice->user_id = Auth::user()->id;
@@ -273,7 +276,7 @@ class InvoiceController extends Controller
                                 ]);
 
                                 foreach( $val['sub'] as $sub ){
-                                    $debitCredit = ( ($val['debit'] ?? 0) + ($val['credit'] ?? 0) );
+                                    $debitCredit = ( ($sub['debit'] ?? 0) + ($sub['credit'] ?? 0) );
                                     $additional_amount += $debitCredit;
                                     InvoiceSub::create([
                                         'invoice_other_expenses_id' => $otherExpense->id,
@@ -359,6 +362,17 @@ class InvoiceController extends Controller
 
              if($request->filled('code')){
                 $invoices = $invoices->where('code', $request->code);
+             }
+
+             if($request->filled('company')){
+                $invoices = $invoices->where('company_id', $request->company);
+             }
+
+             if($request->filled('dateFilter')){
+                $date       = explode('-', request()->input('dateFilter'));
+                $from       = Carbon::parse(trim($date[0]))->format('Y-m-d');
+                $to         = @$date[1] ? Carbon::parse(trim(@$date[1]))->format('Y-m-d') : $from;
+                $invoices   = $invoices->whereBetween('added_date', [$from, $to]);
              }
 
              $invoices = $invoices->paginate(20);

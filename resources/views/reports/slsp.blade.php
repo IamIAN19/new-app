@@ -41,5 +41,8 @@
         </tbody>
     </table>
 </div>
+
+<div class="mt-5"> 
 {{ $pagedGrouped->links() }}
+</div>
 

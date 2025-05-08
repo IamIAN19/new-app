@@ -126,7 +126,7 @@ class ReportService
         $invoices = DB::query()
             ->fromSub($unionQuery, 'records')
             ->orderBy('date')
-            ->get();
+            ->paginate(100);
         
         return view('reports.general_journal', compact('invoices','from', 'to', 'company', 'departments'))->render();
     }

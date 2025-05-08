@@ -78,7 +78,7 @@
     <script>
       $(document).ready(function(){
 
-        $('select[data-toggle="select2"]').select2({placeholder:'Select a department'});
+        $('select[data-toggle="select2"]').select2();
 
         $(document).on('submit', '#frmFilter', function(e){
           e.preventDefault();
