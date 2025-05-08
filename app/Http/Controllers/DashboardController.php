@@ -11,10 +11,13 @@ class DashboardController extends Controller
 {
     public function index(){
 
-        $company_count = Company::count();
-        $total_invoice = Invoice::count();
-        $total_invoice_today = Invoice::whereDate('created_at', Carbon::now()->toDateString())->count();
+        $companies = Company::withCount([
+            'invoices as total_invoices',
+            'invoices as invoices_today' => function ($query) {
+                $query->whereDate('created_at', today());
+            }
+        ])->get();
 
-        return view('dashboard', compact('company_count', 'total_invoice' , 'total_invoice_today' ));
+        return view('dashboard', compact('companies'));
     }
 }

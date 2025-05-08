@@ -2,50 +2,37 @@
     <!-- partial -->
     <div class="content-wrapper">
         <div class="page-header">
-        <h3 class="page-title">
-            <span class="page-title-icon bg-gradient-primary text-white me-2">
-            <i class="mdi mdi-home"></i>
-            </span> Dashboard
-        </h3>
-        <nav aria-label="breadcrumb">
-            <ul class="breadcrumb">
-            <li class="breadcrumb-item active" aria-current="page">
-                <span></span>Overview <i class="mdi mdi-alert-circle-outline icon-sm text-primary align-middle"></i>
-            </li>
-            </ul>
-        </nav>
+            <h3 class="page-title">
+                <span class="page-title-icon bg-gradient-primary text-white me-2">
+                <i class="mdi mdi-home"></i>
+                </span> Dashboard
+            </h3>
+            <nav aria-label="breadcrumb">
+            </nav>
         </div>
-        <div class="row">
-        <div class="col-md-4 stretch-card grid-margin">
-            <div class="card bg-gradient-danger card-img-holder text-white">
+        <div class="card">
             <div class="card-body">
-                <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
-                <h4 class="font-weight-normal mb-3">Company Count <i class="mdi mdi-chart-line mdi-24px float-end"></i>
-                </h4>
-                <h2 class="mb-5">{{ $company_count }}</h2>
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center align-middle">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Total Invoices</th>
+                                <th>Invoices Today</th>
+                            </tr>
+                        </thead>   
+                        <tbody>
+                            @foreach($companies as $company)
+                                <tr>
+                                    <td>{{ $company->name }}</td>
+                                    <td>{{ $company->total_invoices }}</td>
+                                    <td>{{ $company->invoices_today }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                        </table>
+                    </div>
             </div>
-            </div>
-        </div>
-        <div class="col-md-4 stretch-card grid-margin">
-            <div class="card bg-gradient-info card-img-holder text-white">
-            <div class="card-body">
-                <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
-                <h4 class="font-weight-normal mb-3">Total Added Invoice <i class="mdi mdi-bookmark-outline mdi-24px float-end"></i>
-                </h4>
-                <h2 class="mb-5">{{ $total_invoice }}</h2>
-            </div>
-            </div>
-        </div>
-        <div class="col-md-4 stretch-card grid-margin">
-            <div class="card bg-gradient-success card-img-holder text-white">
-            <div class="card-body">
-                <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
-                <h4 class="font-weight-normal mb-3">Total Invoice Added Today <i class="mdi mdi-diamond mdi-24px float-end"></i>
-                </h4>
-                <h2 class="mb-5">{{ $total_invoice_today }}</h2>
-            </div>
-            </div>
-        </div>
         </div>
     </div>
 </x-app-layout>

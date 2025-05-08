@@ -33,6 +33,10 @@
                 border: 1px solid #ced4da !important;
             }
 
+            .form-group{
+                margin-bottom:1rem;
+            }
+
         </style>
     @endpush
     <div class="content-wrapper">

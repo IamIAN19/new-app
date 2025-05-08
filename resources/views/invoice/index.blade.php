@@ -5,7 +5,7 @@
       </div>
       <div class="row">
         <div class="col-md-12 mb-5">
-          <div class="d-flex justify-content-between">
+          <div class="d-flex justify-content-between mb-3">
             <form action="" id="frmSearchFilter">
               <div class="d-flex">
                   <div class="form-group">
@@ -33,7 +33,7 @@
                           required
                       >
                   </div>
-                  <div class="form-group mx-3">
+                  <div class="form-group mx-3 d-flex align-items-center">
                     <button type="submit" class="btn btn-primary">Search</button>
                   </div>
               </div>

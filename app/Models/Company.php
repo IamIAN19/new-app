@@ -25,4 +25,9 @@ class Company extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
 }
