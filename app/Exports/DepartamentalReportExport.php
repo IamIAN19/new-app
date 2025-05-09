@@ -20,14 +20,16 @@ class DepartamentalReportExport implements FromCollection, WithHeadings, WithChu
     protected $source = '';
     protected $saleId;
     protected $departments;
+    protected $type;
 
-    public function __construct($start, $end, $company, $companyName, $departments)
+    public function __construct($start, $end, $company, $companyName, $departments, $type = "")
     {
         $this->start = $start;
         $this->end = $end;
         $this->company = $company;
         $this->companyName = $companyName;
         $this->departments = $departments;
+        $this->type = $type;
     }
 
     public function collection()
@@ -94,30 +96,31 @@ class DepartamentalReportExport implements FromCollection, WithHeadings, WithChu
     {
         $sourceData = Department::whereIn('id', $this->departments)->select('name')->get()->pluck('name')->toArray();
     
-        $this->source = implode(',',$sourceData);
+        $this->source = implode(', ',$sourceData);
 
         return [
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
                 // Insert custom rows at the top
-                $sheet->insertNewRowBefore(1, 3);
+                $sheet->insertNewRowBefore(1, 4);
 
                 $sheet->setCellValue('A1', $this->companyName);
-                $sheet->setCellValue('A2', 'Cash Report');
+                $sheet->setCellValue('A2', ucwords($this->type).' Report');
 
                 $dateRange = strtoupper(date('F j', strtotime($this->start)) . ' TO ' . date('F j', strtotime($this->end)));
-                $sheet->setCellValue('A3', "Date: {$dateRange}, Source: {$this->source}");
+                $sheet->setCellValue('A3', "Date: {$dateRange}");
+                $sheet->setCellValue('A4', "Source: {$this->source}");
 
                 // Merge and center the first 3 rows across all columns (A to H)
-                foreach ([1, 2, 3] as $row) {
+                foreach ([1, 2, 3, 4] as $row) {
                     $sheet->mergeCells("A{$row}:H{$row}");
                     $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal('center');
                     $sheet->getStyle("A{$row}")->getFont()->setBold(true);
                 }
 
                 // Bold the headings row
-                $sheet->getStyle('A4:H4')->getFont()->setBold(true);
+                $sheet->getStyle('A5:H5')->getFont()->setBold(true);
 
                 // Optionally, auto-size columns
                 foreach (range('A', 'H') as $col) {
@@ -130,7 +133,7 @@ class DepartamentalReportExport implements FromCollection, WithHeadings, WithChu
     public function styles(Worksheet $sheet)
     {
         return [
-            4 => ['font' => ['bold' => true]], // Header row
+            5 => ['font' => ['bold' => true]], // Header row
         ];
     }
 }

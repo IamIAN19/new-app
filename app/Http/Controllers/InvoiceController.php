@@ -360,7 +360,7 @@ class InvoiceController extends Controller
              $invoices = Invoice::with('company', 'supplier', 'user', 'updatedBy')->orderByDesc('id');
 
              if($request->filled('code')){
-                $invoices = $invoices->where('code', $request->code);
+                $invoices = $invoices->where('code', $request->code)->orWhere('voucher_no', $request->code);
              }
 
              if($request->filled('company')){

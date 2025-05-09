@@ -103,30 +103,31 @@ class SlspReportExport implements FromCollection, WithHeadings, WithChunkReading
     {   
         $sourceData = Department::whereIn('id', $this->departments)->select('name')->get()->pluck('name')->toArray();
     
-        $this->source = implode(',',$sourceData);
+        $this->source = implode(', ',$sourceData);
 
         return [
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
                 // Insert custom rows at the top
-                $sheet->insertNewRowBefore(1, 3);
+                $sheet->insertNewRowBefore(1, 4);
 
                 $sheet->setCellValue('A1', $this->companyName);
                 $sheet->setCellValue('A2', 'SLSP Report');
 
                 $dateRange = strtoupper(date('F j', strtotime($this->start)) . ' TO ' . date('F j', strtotime($this->end)));
-                $sheet->setCellValue('A3', "Date: {$dateRange}, Source: {$this->source}");
+                $sheet->setCellValue('A3', "Date: {$dateRange}");
+                $sheet->setCellValue('A4', "Source: {$this->source}");
 
                 // Merge and center the first 3 rows across all columns (A to H)
-                foreach ([1, 2, 3] as $row) {
-                    $sheet->mergeCells("A{$row}:H{$row}");
+                foreach ([1, 2, 3, 4] as $row) {
+                    $sheet->mergeCells("A{$row}:J{$row}");
                     $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal('center');
                     $sheet->getStyle("A{$row}")->getFont()->setBold(true);
                 }
 
                 // Bold the headings row
-                $sheet->getStyle('A4:J4')->getFont()->setBold(true);
+                $sheet->getStyle('A5:J5')->getFont()->setBold(true);
 
                 // Optionally, auto-size columns
                 foreach (range('A', 'J') as $col) {
@@ -139,7 +140,7 @@ class SlspReportExport implements FromCollection, WithHeadings, WithChunkReading
     public function styles(Worksheet $sheet)
     {
         return [
-            4 => ['font' => ['bold' => true]], // Header row
+            5 => ['font' => ['bold' => true]], // Header row
         ];
     }
 }

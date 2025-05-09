@@ -97,23 +97,24 @@ class JournalReportExport implements FromQuery, WithHeadings, WithMapping, WithE
                 $sheet = $event->sheet->getDelegate();
 
                 // Insert custom rows at the top
-                $sheet->insertNewRowBefore(1, 3);
+                $sheet->insertNewRowBefore(1, 4);
 
                 $sheet->setCellValue('A1', $this->companyName);
                 $sheet->setCellValue('A2', 'General Journal Report');
 
                 $dateRange = strtoupper(date('F j', strtotime($this->start)) . ' TO ' . date('F j', strtotime($this->end)));
-                $sheet->setCellValue('A3', "Date: {$dateRange}, Source: {$this->source}");
+                $sheet->setCellValue('A3', "Date: {$dateRange}");
+                $sheet->setCellValue('A4', "Source: {$this->source}");
 
                 // Merge and center the first 3 rows across all columns (A to H)
-                foreach ([1, 2, 3] as $row) {
+                foreach ([1, 2, 3, 4] as $row) {
                     $sheet->mergeCells("A{$row}:G{$row}");
                     $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal('center');
                     $sheet->getStyle("A{$row}")->getFont()->setBold(true);
                 }
 
                 // Bold the headings row
-                $sheet->getStyle('A4:G4')->getFont()->setBold(true);
+                $sheet->getStyle('A5:G5')->getFont()->setBold(true);
 
                 // Optionally, auto-size columns
                 foreach (range('A', 'G') as $col) {
@@ -128,7 +129,7 @@ class JournalReportExport implements FromQuery, WithHeadings, WithMapping, WithE
                 $sheet->setCellValue("G{$lastRow}", $this->totalCredit);
 
                 // Bold the total row
-                $sheet->getStyle("F{$lastRow}:H{$lastRow}")->getFont()->setBold(true);
+                $sheet->getStyle("F{$lastRow}:G{$lastRow}")->getFont()->setBold(true);
             }
         ];
     }
@@ -136,7 +137,7 @@ class JournalReportExport implements FromQuery, WithHeadings, WithMapping, WithE
     public function styles(Worksheet $sheet)
     {
         return [
-            4 => ['font' => ['bold' => true]], // Header row
+            5 => ['font' => ['bold' => true]], // Header row
         ];
     }
 }

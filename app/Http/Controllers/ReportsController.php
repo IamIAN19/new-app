@@ -102,7 +102,7 @@ class ReportsController extends Controller
 
         $departments = json_decode($request->departments);
 
-        return Excel::download(new DepartamentalReportExport($request->from, $request->to, $request->company, $company_name, $departments), $request->report_type.'_report.xlsx');
+        return Excel::download(new DepartamentalReportExport($request->from, $request->to, $request->company, $company_name, $departments, $request->report_type), $request->report_type.'_report.xlsx');
     }
 
     public function exportGeneralJournalReport(Request $request)
