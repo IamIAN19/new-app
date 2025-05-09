@@ -48,6 +48,12 @@
                     <i class="align-middle" data-feather="grid"></i> <span class="align-middle">Account title</span>
                 </a>
             </li>
+
+            <li class="sidebar-item {{ request()->routeIs('supplier.index') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('supplier.index') }}">
+                    <i class="align-middle" data-feather="grid"></i> <span class="align-middle">Suppliers</span>
+                </a>
+            </li>
             
             <li class="sidebar-item {{ request()->routeIs('department.index') ? 'active' : '' }}">
                 <a class="sidebar-link" href="{{ route('department.index') }}">

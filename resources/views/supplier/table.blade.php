@@ -5,6 +5,7 @@
         <th>ID</th>
         <th>Name</th>
         <th>TIN#</th>
+        <th>Classification</th>
         <th>Address</th>
         <th>Added By</th>
         <th>Created</th>
@@ -18,6 +19,9 @@
                 <td>{{ $d->id }}</td>
                 <td>{{ $d->name }}</td>
                 <td>{{ $d->tin }}</td>
+                <td>
+                  {{ $d->classification == "vat" ? "VAT" : "Non-VAT" }}
+                </td>
                 <td>{{ $d->address }}</td>
                 <td>{{ $d->user->name ?? "-" }}</td>
                 <td>{{  \Carbon\Carbon::parse($d->created_at)->format('Y F G') }}</td>
