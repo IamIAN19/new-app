@@ -27,6 +27,12 @@
                 </a>
             </li>
 
+            <li class="sidebar-item {{ request()->routeIs('invoices.deleted-invoices') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('invoices.deleted-invoices') }}">
+                    <i class="align-middle" data-feather="clipboard"></i> <span class="align-middle">Deleted Invoices</span>
+                </a>
+            </li>
+
             <li class="sidebar-header">
                 Managers
             </li>
@@ -60,12 +66,13 @@
                     <i class="align-middle" data-feather="align-left"></i> <span class="align-middle">Department</span>
                 </a>
             </li>
-            
-            <li class="sidebar-item {{ request()->routeIs('users.index') ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ route('users.index') }}">
-                    <i class="align-middle" data-feather="users"></i> <span class="align-middle">Users</span>
-                </a>
-            </li>
+            @if( auth()->user()->id === 1 )
+                <li class="sidebar-item {{ request()->routeIs('users.index') ? 'active' : '' }}">
+                    <a class="sidebar-link" href="{{ route('users.index') }}">
+                        <i class="align-middle" data-feather="users"></i> <span class="align-middle">Users</span>
+                    </a>
+                </li>
+            @endif
         </ul>
     </div>
 </nav>

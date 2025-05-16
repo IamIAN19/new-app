@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -16,7 +17,7 @@ class UserController extends Controller
 
     public function list()
     {
-        $users = User::all();
+        $users = User::with('permissions')->get();
         return view('users.partials.list', compact('users'));
     }
 
@@ -27,15 +28,15 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email',
             'raw_password' => 'required|string|min:6',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json([
                 'errors' => $validator->errors(),
             ], 422);
         }
-    
+
         $rawPassword = $request->raw_password;
-    
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -43,13 +44,26 @@ class UserController extends Controller
             'raw_password' => $rawPassword,
             'status' => 1,
         ]);
-    
+
+        // Sync permissions
+        $permissions = $request->input('permissions', []);
+        $permIds = Permission::whereIn('name', $permissions)->pluck('id');
+        $user->permissions()->sync($permIds);
+
         return response()->json(['success' => true, 'message' => 'User created successfully']);
     }
 
     public function edit($id)
     {
-        return response()->json(User::findOrFail($id));
+        $user = User::with('permissions')->findOrFail($id);
+
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'raw_password' => $user->raw_password,
+            'permissions' => $user->permissions->pluck('name') // returns ['add', 'edit', ...]
+        ]);
     }
 
     public function update(Request $request, $id)
@@ -61,25 +75,30 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email,' . $user->id,
             'raw_password' => 'nullable|string|min:6',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json([
                 'errors' => $validator->errors(),
             ], 422);
         }
-    
+
         $updateData = [
             'name' => $request->name,
             'email' => $request->email,
         ];
-    
+
         if ($request->filled('raw_password')) {
             $updateData['password'] = Hash::make($request->raw_password);
             $updateData['raw_password'] = $request->raw_password;
         }
-    
+
         $user->update($updateData);
-    
+
+        // Sync permissions
+        $permissions = $request->input('permissions', []);
+        $permIds = Permission::whereIn('name', $permissions)->pluck('id');
+        $user->permissions()->sync($permIds);
+
         return response()->json(['success' => true, 'message' => 'User updated successfully']);
     }
 

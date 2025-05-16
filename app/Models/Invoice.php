@@ -5,11 +5,12 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
 class Invoice extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = [];
 
@@ -25,7 +26,7 @@ class Invoice extends Model
                 throw new \Exception("Cannot generate invoice code without company_id.");
             }
     
-            $invoice->code = \App\Services\InvoiceCodeGenerator::generate($invoice->company_id);
+            $invoice->code = \App\Services\InvoiceCodeGenerator::generate($invoice->company_id, $invoice->added_date);
         });
     }
    
@@ -62,5 +63,10 @@ class Invoice extends Model
     public function category()
     {
         return $this->belongsTo(SalesCategory::class, 'sales_category_id');
+    }
+
+    public function deletedBy()
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
     }
 }

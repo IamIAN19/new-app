@@ -12,7 +12,7 @@
           <th>Supplier</th>
           <th>Added By</th>
           <th>Created at</th>
-          <th>Updated_by</th>
+          <th>Deleted By</th>
           <th>Action</th>
         </tr>
       </thead>    
@@ -26,19 +26,11 @@
                   <td>{{ $invoice->supplier }}</td>
                   <td>{{ $invoice->user->name }}</td>
                   <td>{{ \Carbon\Carbon::parse($invoice->added_date)->format('Y-m-d') }}</td>
-                  <td>{{ $invoice->updatedBy->name ?? "-" }}</td>
+                  <td>{{ $invoice->deletedBy->name ?? "-" }}</td>
                   <td data-id="{{ $invoice->id }}">
-                      @hasPermission('edit')
-                        <a href="/invoices/{{ $invoice->id }}/show" class="btn btn-sm btn-secondary btn-edit">
-                            Edit
-                        </a>
-                      @endhasPermission
-                      
-                      @hasPermission('delete')
-                        <button class="btn btn-sm btn-danger btn-remove" data-id="{{ $invoice->id }}">
-                          Delete
-                        </button>
-                      @endhasPermission
+                      <a href="/invoices/show-deleted?id={{ $invoice->id }}" class="btn btn-sm btn-secondary btn-view">
+                          View
+                      </a>
                   </td>
               </tr>
           @endforeach

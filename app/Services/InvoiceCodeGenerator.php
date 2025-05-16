@@ -9,11 +9,11 @@ use Carbon\Carbon;
 
 class InvoiceCodeGenerator
 {
-    public static function generate(int $companyId): string
+    public static function generate(int $companyId, $date): string
     {
-        $monthKey = now()->format('Y-m'); // e.g., '2025-05'
-        $displayMonth = now()->format('m'); // e.g., '05'
-        $year = now()->format('y');       // '25'
+        $monthKey = Carbon::parse($date)->format('Y-m'); // e.g., '2025-05'
+        $displayMonth = Carbon::parse($date)->format('m'); // e.g., '05'
+        $year = Carbon::parse($date)->format('y');       // '25'
 
         return DB::transaction(function () use ($companyId, $monthKey, $displayMonth, $year) {
             $sequence = InvoiceSequence::lockForUpdate()->firstOrCreate(

@@ -324,19 +324,14 @@ class InvoiceController extends Controller
             $request->validate(['id' => 'required|numeric']);
 
             $result = DB::transaction(function () use ($request) {
-                // Get related expense IDs
-                $ids = InvoicesOtherExpenses::where('invoice_id', $request->id)
-                            ->pluck('id')
-                            ->toArray();
-            
-                // Delete related InvoiceSub entries
-                InvoiceSub::whereIn('invoice_other_expenses_id', $ids)->delete();
-            
-                // Delete related InvoicesOtherExpenses entries
-                InvoicesOtherExpenses::where('invoice_id', $request->id)->delete();
-            
+              
+                // Update first the deleted by
+                $invoice = Invoice::find($request->id);
+                $invoice->deleted_by = Auth::user()->id;
+                $invoice->save();
+                
                 // Delete the Invoice itself
-                $invoiceDeleted = Invoice::where('id', $request->id)->delete();
+                $invoiceDeleted = $invoice->delete();
             
                 // Optionally check if the invoice was deleted
                 return $invoiceDeleted > 0;
@@ -386,5 +381,60 @@ class InvoiceController extends Controller
        }
  
        return abort(403, 'Unauthorized!');
+    }
+
+    public function getDeleted()
+    {
+        $invoices = Invoice::with('company', 'supplier', 'user', 'updatedBy')->onlyTrashed()->orderByDesc('id')->paginate(20);
+        $company = Company::select('id', 'name')->get();
+        $departments = Department::select('id', 'name')->get();
+
+        return view('invoice.deleted.index', compact('invoices', 'company', 'departments'));
+    }
+
+    public function fetchDeletedContent( Request $request)
+    {
+       if( $request->ajax() ){
+          
+          try{
+             $invoices = Invoice::with('company', 'supplier', 'user', 'updatedBy')->onlyTrashed()->orderByDesc('id');
+
+             if($request->filled('code')){
+                $invoices = $invoices->where('code', $request->code)->orWhere('voucher_no', $request->code);
+             }
+
+             if($request->filled('company')){
+                $invoices = $invoices->where('company_id', $request->company);
+             }
+
+             if($request->filled('dateFilter')){
+                $date       = explode('-', request()->input('dateFilter'));
+                $from       = Carbon::parse(trim($date[0]))->format('Y-m-d');
+                $to         = @$date[1] ? Carbon::parse(trim(@$date[1]))->format('Y-m-d') : $from;
+                $invoices   = $invoices->whereBetween('added_date', [$from, $to]);
+             }
+
+             $invoices = $invoices->paginate(20);
+ 
+             $html = view('invoice.deleted.table', compact('invoices'))->render();
+    
+             return response()->json(['html' => $html], 200); 
+          }
+          catch( Exception $e){
+             return response()->json(['message' => $e->getMessage()], 500);
+          }
+       }
+ 
+       return abort(403, 'Unauthorized!');
+    }
+
+    public function showDeleted(Request $request){
+        $invoice        = Invoice::where('id', $request->id)->onlyTrashed()->first();
+        $company        = Company::select('id', 'name')->active()->get();
+        $sales_category = SalesCategory::select('id', 'name')->active()->get();
+        $account_titles = AccountTitle::with('subs')->active()->get();
+        $departments    = Department::select('id', 'name')->active()->get();
+
+        return view('invoice.deleted.show', compact('company', 'sales_category', 'account_titles', 'invoice', 'departments'));
     }
 }

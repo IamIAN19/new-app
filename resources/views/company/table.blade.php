@@ -27,13 +27,18 @@
                         @endif
                     </td>
                     <td data-id="{{ $d->id }}" data-name="{{ $d->name }}">
-                        <button class="btn btn-sm btn-secondary btn-edit">
+
+                        @hasPermission('edit')
+                          <button class="btn btn-sm btn-secondary btn-edit">
                             Edit
-                        </button>
-                        |
-                        <button class="btn btn-sm btn-{{ $d->status ? 'danger': 'success' }} btn-enable" data-status="{{ $d->status ? 0 : 1 }}">
-                            @if($d->status) Disable @else Enable @endif
-                        </button>
+                            </button>
+                        @endhasPermission
+                        
+                        @hasPermission('delete')
+                            <button class="btn btn-sm btn-{{ $d->status ? 'danger': 'success' }} btn-enable" data-status="{{ $d->status ? 0 : 1 }}">
+                                @if($d->status) Disable @else Enable @endif
+                            </button>
+                        @endhasPermission
                     </td>
                 </tr>
             @endforeach

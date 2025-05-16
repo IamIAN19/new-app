@@ -1,7 +1,7 @@
 <x-app-layout>  
   <div class="content-wrapper">
       <div class="page-header">
-        <h3 class="page-title"> Invoices </h3>
+        <h3 class="page-title"> Deleted Invoices </h3>
       </div>
       <div class="row">
         <div class="col-md-12 mb-5">
@@ -38,15 +38,10 @@
                   </div>
               </div>
             </form>
-            @hasPermission('add')
-                <div class="">
-                  <a href="{{ route('invoices.create') }}" class="btn btn-sm btn-success mb-2">Add new invoice</a>
-                </div>
-            @endhasPermission
           </div>
           <div class="card">
               <div class="card-body table-body">
-                @include('invoice.table')
+                @include('invoice.deleted.table')
               </div>
             </div>
         </div>
@@ -63,39 +58,6 @@
             fetchContent(page);
           }); 
       
-          $(document).on('click', '.btn-remove', function(){
-            let id = $(this).attr('data-id');
-          
-            Swal.fire({
-                icon: 'warning',
-                text: ` Are you sure you want to remove this invoice?`,
-                showCancelButton: true,
-                confirmButtonText: "Yes",
-            }).then((result) => {
-                if (result.isConfirmed) {
-                  $.blockUI();
-                  $.ajax({
-                    url: "{{ route('invoices.delete') }}",
-                    data: { id : id,
-                        _token: "{{ csrf_token() }}"
-                    },
-                    type: 'POST',
-                    dataType: 'json',
-                    success: function ( response ){
-                      popupMessage('Success', response.message, 'success');
-                      fetchContent();
-                    },
-                    error: function ( response ){
-                      popupMessage('Error', 'Failed!', 'error');
-                    },
-                    complete: function ( response ){
-                      $.unblockUI();
-                    }
-                  });
-                } 
-            });
-          })
-
           $(document).on('submit', '#frmSearchFilter', function(e){
             e.preventDefault();
 
@@ -110,7 +72,7 @@
             let dateFilter = $('.customDateFilterInput').val();
 
             $.ajax({
-              url: "{{ route('invoices.fetch-content') }}",
+              url: "{{ route('invoices.fetch-content-deleted') }}",
               type: 'GET',
               data: { page : page,
                     code: code,

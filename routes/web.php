@@ -49,6 +49,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/delete', 'delete')->name('invoices.delete');
         Route::get('/fetch-account-section', 'fetchAccountSection')->name('invoices.fetch-account-section');
         Route::get('/fetch-content', 'fetchContent')->name('invoices.fetch-content');
+        Route::get('/deleted-invoices', 'getDeleted')->name('invoices.deleted-invoices');
+        Route::get('/fetch-content-deleted', 'fetchDeletedContent')->name('invoices.fetch-content-deleted');
+        Route::get('/show-deleted', 'showDeleted')->name('invoices.show-deleted');
     });
 
     Route::prefix('company')->controller(CompanyController::class)->group(function() {

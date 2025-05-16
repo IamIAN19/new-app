@@ -4,7 +4,9 @@
         <div class="my-2">
           <div class="d-flex justify-content-between align-items-center">
             <h3 class="page-title"> Department Manager </h3>
-            <button class="btn btn-primary align-self-end btn-show" data-href="{{ route('department.store') }}">Add Department</button>
+              @hasPermission('add')
+                <button class="btn btn-primary align-self-end btn-show" data-href="{{ route('department.store') }}">Add Department</button>
+              @endhasPermission
           </div>
         </div>
 

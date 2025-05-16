@@ -3,7 +3,9 @@
     <div class="my-2">
       <div class="d-flex justify-content-between align-items-center">
         <h3 class="page-title"> Account Title Manager </h3>
-        <button class="btn btn-primary align-self-end" id="btnAddAccount" data-bs-toggle="modal" data-bs-target="#accountModal">Add Account</button>
+          @hasPermission('add')
+            <button class="btn btn-primary align-self-end" id="btnAddAccount" data-bs-toggle="modal" data-bs-target="#accountModal">Add Account</button>
+          @endhasPermission
       </div>
     </div>
 
@@ -46,14 +48,19 @@
                       <td>{{ $d->created_at->format('d F Y') }}</td>
                       <td>{{ $d->updatedBy->name ?? "-" }}</td>
                       <td data-id="{{ $d->id }}">
-                        <button class="btn btn-sm btn-secondary btn-edit" 
-                          data-id="{{ $d->id }}"
-                        >
-                          Edit
-                        </button>
-                        <button class="btn btn-sm btn-{{ $d->status ? 'danger': 'success' }} btn-enable" data-status="{{ $d->status ? 0 : 1 }}">
-                          @if($d->status) Disable @else Enable @endif
-                        </button>
+                          @hasPermission('edit')
+                            <button class="btn btn-sm btn-secondary btn-edit" 
+                              data-id="{{ $d->id }}"
+                            >
+                              Edit
+                            </button>
+                          @endhasPermission
+
+                          @hasPermission('delete')
+                            <button class="btn btn-sm btn-{{ $d->status ? 'danger': 'success' }} btn-enable" data-status="{{ $d->status ? 0 : 1 }}">
+                              @if($d->status) Disable @else Enable @endif
+                            </button>
+                          @endhasPermission
                       </td>
                     </tr>
                   @endforeach

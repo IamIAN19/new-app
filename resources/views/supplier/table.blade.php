@@ -27,13 +27,17 @@
                 <td>{{  \Carbon\Carbon::parse($d->created_at)->format('Y F G') }}</td>
                 <td>{{ $d->updatedBy->name ?? "-" }}</td>
                 <td data-id="{{ $d->id }}" data-name="{{ $d->name }}"  data-tin="{{ $d->tin }}"  data-address="{{ $d->address }}" data-classification="{{ $d->classification }}">
-                    <button class="btn btn-sm btn-secondary btn-edit">
-                        Edit
-                    </button>
-                    |
-                    <button class="btn btn-sm btn-danger btn-delete">
-                        Delete
-                    </button>
+                      @hasPermission('edit')
+                        <button class="btn btn-sm btn-secondary btn-edit">
+                            Edit
+                        </button>
+                      @endhasPermission
+
+                      @hasPermission('delete')
+                        <button class="btn btn-sm btn-danger btn-delete">
+                            Delete
+                        </button>
+                      @endhasPermission
                 </td>
             </tr>
         @endforeach
